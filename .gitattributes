@@ -1,0 +1,13 @@
+*.psd filter=lfs diff=lfs merge=lfs -text
+
+#code
+*.cs text
+
+#images
+*.jpg binary
+*.png binary
+
+#unity related
+*.prefab text
+*.unity text
+*.meta text
