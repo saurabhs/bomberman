@@ -119,8 +119,8 @@ namespace Bomberman
 
         private bool IsValidMove( Vector3 nextPosition )
         {
-            return (mapData.data[Mathf.Abs( ( int )nextPosition.x )][Mathf.Abs( ( int )nextPosition.z )]) != 1 ||
-                (mapData.data[Mathf.Abs( ( int )nextPosition.x )][Mathf.Abs( ( int )nextPosition.z )]) != 2;
+            return (mapData.data[Mathf.Abs( ( int )nextPosition.x )][Mathf.Abs( ( int )nextPosition.z )]) == 0 ||
+                (mapData.data[Mathf.Abs( ( int )nextPosition.x )][Mathf.Abs( ( int )nextPosition.z )]) > 2;
         }
         #endregion
 
