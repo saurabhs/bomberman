@@ -17,7 +17,7 @@ namespace Bomberman
     {
         public int height;
         public int width;
-        public int[][] data;
+        public int[,] data;
         public List<TilesetData> tilesetData;
     }
 
@@ -63,13 +63,12 @@ namespace Bomberman
             var tiles = dataNode.InnerText.Split( ',' );
             var index = 0;
 
-            mapData.data = new int[mapData.width][];
+            mapData.data = new int[mapData.width, mapData.height];
             for ( var j = 0; j < mapData.height; j++ )
             {
-                mapData.data[j] = new int[mapData.width];
                 for ( var i = 0; i < mapData.width; i++ )
                 {
-                    mapData.data[j][i] = int.Parse( tiles[index++].Trim() );
+                    mapData.data[i, j] = int.Parse( tiles[index++].Trim() );
                 }
             }
 
