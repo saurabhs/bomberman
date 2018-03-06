@@ -76,12 +76,6 @@ namespace Bomberman
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene( SceneManager.GetActiveScene() );
         }
 
-        [MenuItem( "Tools/Create Players" )]
-        private void CreatePlayers()
-        {
-
-        }
-
         private static GameObject GetAsset( int index )
         {
             if ( index == 0 )
