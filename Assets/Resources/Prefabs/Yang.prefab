@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4490765736259834}
   - component: {fileID: 33988760758225146}
-  - component: {fileID: 136490469509704754}
   - component: {fileID: 23411106097199848}
   - component: {fileID: 114569928411310436}
   - component: {fileID: 54966888016070390}
@@ -112,22 +111,8 @@ MonoBehaviour:
   speed: 10
   bombsInHand: 10
   bombGO: {fileID: 114329805401254740, guid: 0d1e44b2aa1cba14cbc13838b5b9b3dc, type: 2}
-  playerID: 1
   keyUp: 119
   keyDown: 115
   keyRight: 100
   keyLeft: 97
   keyDropBomb: 306
---- !u!136 &136490469509704754
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1597086356985006}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}

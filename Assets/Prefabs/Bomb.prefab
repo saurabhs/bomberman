@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4265091615310134}
   - component: {fileID: 33935810843879982}
   - component: {fileID: 23941027648678632}
-  - component: {fileID: 65586551936226852}
   - component: {fileID: 114329805401254740}
   m_Layer: 0
   m_Name: Bomb
@@ -82,18 +81,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1488800209547720}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &65586551936226852
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1488800209547720}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114329805401254740
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -107,5 +94,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent: {fileID: 0}
   cooldown: 2
+  detonateTime: 2
   range: 4
   go: {fileID: 1024938107980846, guid: aa874796928495147ad79b00bc6106ad, type: 2}
