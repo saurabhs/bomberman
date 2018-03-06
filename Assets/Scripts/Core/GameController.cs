@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Bomberman
@@ -16,6 +17,11 @@ namespace Bomberman
         [SerializeField]
         private Text timerText;
 
+        /// <summary>
+        /// list of blocks in grid
+        /// </summary>
+        public List<GameObject> wallBlocks;
+
         #region unity lifecycle
         private void Awake()
         {
@@ -25,7 +31,15 @@ namespace Bomberman
 
         private void Start()
         {
-            FindObjectOfType<PlayerController>().SetMapData( mapData );
+            if ( wallBlocks == null || wallBlocks.Count == 0 )
+                throw new System.Exception( "Cannot find any blocks reference." );
+
+            var playerControllers = FindObjectsOfType<PlayerController>();
+            for ( var i = 0; i < playerControllers.Length; i++ )
+            {
+                playerControllers[i].SetMapData( mapData );
+                playerControllers[i].SetWallBlocksList( wallBlocks );
+            }
         }
 
         private void Update()
@@ -59,6 +73,11 @@ namespace Bomberman
             timerText.text = $"{min}:{sec}";
         }
         #endregion
+
+        public void SetWallBlocks( List<GameObject> wallBlocks )
+        {
+            this.wallBlocks = wallBlocks;
+        }
 
         /// <summary>
         /// Time over response
