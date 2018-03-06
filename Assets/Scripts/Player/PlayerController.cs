@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Bomberman
 {
@@ -19,16 +20,6 @@ namespace Bomberman
         /// bomb gameobject
         /// </summary>
         public Bomb bombGO;
-
-        /// <summary>
-        /// player id to differentiate between player1 and player2
-        /// </summary>
-        public EPlayerID playerID;
-
-        /// <summary>
-        /// direction in which the player is moving
-        /// </summary>
-        private EDirection direction;
 
         /// <summary>
         /// bomb drop state
@@ -59,6 +50,12 @@ namespace Bomberman
         /// cooldown between two movement input
         /// </summary>
         private float inputCooldown = 2f;
+
+        /// <summary>
+        /// blocks list to pass to bomb 
+        /// on explotion for grid updation
+        /// </summary>
+        private List<GameObject> wallBlocks;
         #endregion
 
         #region input
@@ -93,6 +90,14 @@ namespace Bomberman
         {
             this.mapData = mapData;
         }
+
+        /// <summary>
+        /// set wall blocks list
+        /// </summary>
+        public void SetWallBlocksList( List<GameObject> wallBlocks )
+        {
+            this.wallBlocks = wallBlocks;
+        }
         #endregion
 
         #region Movement
@@ -117,10 +122,10 @@ namespace Bomberman
             }
         }
 
-        private bool IsValidMove( Vector3 nextPosition )
+        private bool IsValidMove( Point point )
         {
-            return (mapData.data[Mathf.Abs( ( int )nextPosition.x ), Mathf.Abs( ( int )nextPosition.z )]) == 0 ||
-                (mapData.data[Mathf.Abs( ( int )nextPosition.x ), Mathf.Abs( ( int )nextPosition.z )]) > 2;
+            return (point.x >= 0 && point.x < mapData.width && point.y <= 0 && Mathf.Abs( point.y ) < mapData.height) &&
+                (mapData.data[Mathf.Abs( point.x ), Mathf.Abs( point.y )] == 0 || (mapData.data[Mathf.Abs( point.x ), Mathf.Abs( point.y )]) > 2);
         }
         #endregion
 
@@ -129,66 +134,35 @@ namespace Bomberman
         {
             if ( !_isBombActive && bombsInHand > 0 && Input.GetKeyDown( keyDropBomb ) )
             {
-                Instantiate( bombGO, transform.position, Quaternion.identity ).StarDetonation( this, mapData );
+                Instantiate( bombGO, transform.position, Quaternion.identity ).StarDetonation( this, mapData, wallBlocks );
             }
         }
 
         private void MovementInput()
         {
-            var nextPosition = Vector3.zero;
-
-            if ( Input.GetKeyUp( keyUp ) )
+            if ( Input.GetKey( keyUp ) )
             {
-                if ( direction != EDirection.Up )
-                {
-                    direction = EDirection.Up;
-                }
-                else
-                {
-                    //nextPosition = position + Vector3.forward;
-                    SetNextPositionIfValid( position + Vector3.forward );
-                }
+                SetNextPositionIfValid( new Point( position + Vector3.forward ) );
             }
-            else if ( Input.GetKeyUp( keyDown ) )
+            else if ( Input.GetKey( keyDown ) )
             {
-                if ( direction != EDirection.Down )
-                {
-                    direction = EDirection.Down;
-                }
-                else
-                {
-                    SetNextPositionIfValid( position - Vector3.forward );
-                }
+                SetNextPositionIfValid( new Point( position - Vector3.forward ) );
             }
-            else if ( Input.GetKeyUp( keyRight ) )
+            else if ( Input.GetKey( keyRight ) )
             {
-                if ( direction != EDirection.Right )
-                {
-                    direction = EDirection.Right;
-                }
-                else
-                {
-                    SetNextPositionIfValid( position + Vector3.right );
-                }
+                SetNextPositionIfValid( new Point( position + Vector3.right ) );
             }
-            else if ( Input.GetKeyUp( keyLeft ) )
+            else if ( Input.GetKey( keyLeft ) )
             {
-                if ( direction != EDirection.Left )
-                {
-                    direction = EDirection.Left;
-                }
-                else
-                {
-                    SetNextPositionIfValid( position - Vector3.right );
-                }
+                SetNextPositionIfValid( new Point( position - Vector3.right ) );
             }
         }
 
-        private void SetNextPositionIfValid( Vector3 nextPosition )
+        private void SetNextPositionIfValid( Point point )
         {
-            if ( IsValidMove( nextPosition ) )
+            if ( IsValidMove( point ) )
             {
-                position = nextPosition;
+                position = new Vector3( point.x, position.y, point.y );
                 canMove = false;
                 isMoving = true;
             }
@@ -209,19 +183,5 @@ namespace Bomberman
         }
 
         #endregion
-    }
-
-    public enum EPlayerID
-    {
-        P1,
-        P2
-    }
-
-    public enum EDirection
-    {
-        Up,
-        Down,
-        Left,
-        Right
     }
 }
