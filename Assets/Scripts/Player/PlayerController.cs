@@ -160,6 +160,14 @@ namespace Bomberman
         }
         #endregion
 
+        #region trigger detection and response
+        private void OnTriggerEnter( Collider trigger )
+        {
+            PlayerPrefs.SetString( Constants.GAME_RESULT, (gameObject.name.Split( '_' )[1].ToLower().Equals( "yang" ) ? Constants.GAME_YING : Constants.GAME_YANG) );
+            UnityEngine.SceneManagement.SceneManager.LoadScene( "gameover" );
+        }
+        #endregion
+
         #region combat
         public void OnBombDetonateStart()
         {
