@@ -44,7 +44,7 @@ namespace Bomberman
         /// <summary>
         /// next move position
         /// </summary>
-        private Vector3 position = Vector3.zero;
+        private Vector3 nextPosition = Vector3.zero;
 
         /// <summary>
         /// blocks list to pass to bomb 
@@ -96,20 +96,20 @@ namespace Bomberman
         {
             if ( canMove )
             {
-                position = transform.position;
+                nextPosition = transform.position;
                 MovementInput();
             }
 
             if ( isMoving )
             {
-                if ( transform.position == position )
+                if ( transform.position == nextPosition )
                 {
                     isMoving = false;
                     canMove = true;
                     MovementInput();
                 }
 
-                transform.position = Vector3.MoveTowards( transform.position, position, speed * Time.deltaTime );
+                transform.position = Vector3.MoveTowards( transform.position, nextPosition, speed * Time.deltaTime );
             }
         }
 
@@ -133,19 +133,19 @@ namespace Bomberman
         {
             if ( Input.GetKey( keyUp ) )
             {
-                SetNextPositionIfValid( new Point( position + Vector3.forward ) );
+                SetNextPositionIfValid( new Point( nextPosition + Vector3.forward ) );
             }
             else if ( Input.GetKey( keyDown ) )
             {
-                SetNextPositionIfValid( new Point( position - Vector3.forward ) );
+                SetNextPositionIfValid( new Point( nextPosition - Vector3.forward ) );
             }
             else if ( Input.GetKey( keyRight ) )
             {
-                SetNextPositionIfValid( new Point( position + Vector3.right ) );
+                SetNextPositionIfValid( new Point( nextPosition + Vector3.right ) );
             }
             else if ( Input.GetKey( keyLeft ) )
             {
-                SetNextPositionIfValid( new Point( position - Vector3.right ) );
+                SetNextPositionIfValid( new Point( nextPosition - Vector3.right ) );
             }
         }
 
@@ -153,7 +153,7 @@ namespace Bomberman
         {
             if ( IsValidMove( point ) )
             {
-                position = new Vector3( point.x, position.y, point.y );
+                nextPosition = new Vector3( point.x, nextPosition.y, point.y );
                 canMove = false;
                 isMoving = true;
             }
