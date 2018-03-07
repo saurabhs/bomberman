@@ -32,15 +32,19 @@ namespace Bomberman
         /// <summary>
         /// list of wall gameobject
         /// </summary>
-        private List<GameObject> wallBlocks;
+        private List<BlockMapper> wallBlocks;
+
+        /// <summary>
+        /// objects created for explosion
+        /// </summary>
+        List<GameObject> explosionsEffect = new List<GameObject>();
         #endregion
 
         #region combat
         /// <summary>
         /// called from player after instantiation
         /// </summary>
-        /// <param name="parent"></param>
-        public void StarDetonation( PlayerController parent, MapData mapData, List<GameObject> wallBlocks )
+        public void StarDetonation( PlayerController parent, MapData mapData, List<BlockMapper> wallBlocks )
         {
             this.parent = parent;
             this.mapData = mapData;

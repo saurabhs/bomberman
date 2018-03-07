@@ -8,7 +8,7 @@ namespace Bomberman
 {
     public class MapGeneration : Editor
     {
-        [MenuItem( "Design/Generate Map" )]
+        [MenuItem( "Tools/Generate Map" )]
         private static void GenerateMap()
         {
             //delete old world prefab
@@ -18,19 +18,12 @@ namespace Bomberman
                 DestroyImmediate( oldWorld );
             }
 
-            //delete old player prefabs
-            var playerControllers = FindObjectsOfType<PlayerController>();
-            if ( playerControllers != null && playerControllers.Length > 0 )
-            {
-                DestroyImmediate( playerControllers[0].gameObject );
-                //DestroyImmediate( playerControllers[1] );
-            }
-
             var mapData = Common.GetMapData( SceneManager.GetActiveScene().name );
             var worldParent = new GameObject( "_World" );
             worldParent.tag = "World";
 
-            var wallBlocks = new List<GameObject>();
+            var wallBlocksDict = new Dictionary<int, GameObject>();
+            var wallBlocksMapper = new List<BlockMapper>();
 
             var index = 0;
             for ( var j = 0; j < mapData.height; j++ )
@@ -38,17 +31,32 @@ namespace Bomberman
                 for ( var i = 0; i < mapData.width; i++ )
                 {
                     var id = mapData.data[i, j];
-                    var go = GetAsset( id );
+                    if ( id != 0 )
+                    {
+                        var go = GetAsset( id );
 
-                    //set ground height to -1
-                    var tile = Instantiate( go, new Vector3( i, id == Constants.GROUND_ID ? -1 : 0, -j ), Quaternion.identity, worldParent.transform ) as GameObject;
-                    tile.name = $"_{go.name}_{index}";
+                        //set ground height to -1
+                        var tile = Instantiate( go, new Vector3( i, 0, -j ), Quaternion.identity, worldParent.transform ) as GameObject;
+                        tile.name = $"_{go.name}_{index}";
 
-                    //add wall blocks and ground
-                    wallBlocks.Add( tile );
+                        //add only dest wall blocks
+                        if ( id == Constants.DESTRUCTABLE_WALL_ID )
+                        {
+                            //wallBlocksDict.Add( index, tile );
+                            wallBlocksMapper.Add( new BlockMapper( index, tile ) );
+                        }
+                    }
 
                     index++;
                 }
+            }
+
+            //delete old player prefabs
+            var playerControllers = FindObjectsOfType<PlayerController>();
+            if ( playerControllers != null && playerControllers.Length > 0 )
+            {
+                DestroyImmediate( playerControllers[0].gameObject );
+                DestroyImmediate( playerControllers[1].gameObject );
             }
 
             //create players
@@ -70,7 +78,8 @@ namespace Bomberman
             //create new gameController object
             var gameController = Instantiate( Resources.Load( @"Prefabs\GameController" ) ) as GameObject;
             gameController.name = "_gameController";
-            gameController.GetComponent<GameController>().SetWallBlocks( wallBlocks );
+            gameController.GetComponent<GameController>().SetWallBlocks( wallBlocksMapper );
+            gameController.GetComponent<GameController>().SetPlayerControllers( player1, player2 );
 
             //save scene 
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene( SceneManager.GetActiveScene() );
@@ -78,13 +87,13 @@ namespace Bomberman
 
         private static GameObject GetAsset( int index )
         {
-            if ( index == 0 )
+            if ( index == Constants.GROUND_ID )
                 return Resources.Load( @"Prefabs\Ground" ) as GameObject;
-            else if ( index == 1 )
+            else if ( index == Constants.DESTRUCTABLE_WALL_ID )
                 return Resources.Load( @"Prefabs\DestructableWall" ) as GameObject;
-            else if ( index == 2 )
+            else if ( index == Constants.INDESTRUCTABLE_WALL_ID )
                 return Resources.Load( @"Prefabs\IndestructableWall" ) as GameObject;
-            else if ( index == 3 )
+            else if ( index == Constants.PLAYER1_ID )
                 return Resources.Load( @"Prefabs\Ying" ) as GameObject;
             else
                 return Resources.Load( @"Prefabs\Yang" ) as GameObject;

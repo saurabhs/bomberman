@@ -47,15 +47,10 @@ namespace Bomberman
         private Vector3 position = Vector3.zero;
 
         /// <summary>
-        /// cooldown between two movement input
-        /// </summary>
-        private float inputCooldown = 2f;
-
-        /// <summary>
         /// blocks list to pass to bomb 
         /// on explotion for grid updation
         /// </summary>
-        private List<GameObject> wallBlocks;
+        private List<BlockMapper> wallBlocks;
         #endregion
 
         #region input
@@ -70,10 +65,6 @@ namespace Bomberman
         #endregion
 
         #region unity lifecycle
-        private void Start()
-        {
-        }
-
         private void Update()
         {
             Walk();
@@ -94,7 +85,7 @@ namespace Bomberman
         /// <summary>
         /// set wall blocks list
         /// </summary>
-        public void SetWallBlocksList( List<GameObject> wallBlocks )
+        public void SetWallBlocks( List<BlockMapper> wallBlocks )
         {
             this.wallBlocks = wallBlocks;
         }

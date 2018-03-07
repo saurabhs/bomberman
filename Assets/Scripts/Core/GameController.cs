@@ -9,23 +9,28 @@ namespace Bomberman
         [SerializeField] private float _levelTime = 120f;
 
         /// <summary>
-        /// map data
+        /// raw grid data
         /// </summary>
         public MapData mapData;
 
-        [Header( "UI" )]
-        [SerializeField]
+        [Header( "UI" ), SerializeField]
         private Text timerText;
 
         /// <summary>
-        /// list of blocks in grid
+        /// list for saving destructible wall go 
+        /// for destroyinng later in game
         /// </summary>
-        public List<GameObject> wallBlocks;
+        public List<BlockMapper> wallBlocks = new List<BlockMapper>();
+
+        /// <summary>
+        /// list of player controller refs
+        /// </summary>
+        public List<GameObject> playerControllers = new List<GameObject>();
 
         #region unity lifecycle
         private void Awake()
         {
-            //cache map data
+            //cache map data 
             mapData = Common.GetMapData( UnityEngine.SceneManagement.SceneManager.GetActiveScene().name );
         }
 
@@ -34,11 +39,19 @@ namespace Bomberman
             if ( wallBlocks == null || wallBlocks.Count == 0 )
                 throw new System.Exception( "Cannot find any blocks reference." );
 
-            var playerControllers = FindObjectsOfType<PlayerController>();
-            for ( var i = 0; i < playerControllers.Length; i++ )
+            if ( playerControllers == null || playerControllers.Count == 0 )
+                throw new System.Exception( "Cannot find any playerController references." );
+
+            //enable yang for coop match
+            playerControllers[1].SetActive( PlayerPrefs.GetInt( Constants.GAME_TYPE, Constants.COOP_ID ) == Constants.COOP_ID );
+            foreach ( var pc in playerControllers )
             {
-                playerControllers[i].SetMapData( mapData );
-                playerControllers[i].SetWallBlocksList( wallBlocks );
+                //assign data only to enabled playerController
+                if ( pc.activeInHierarchy )
+                {
+                    pc.GetComponent<PlayerController>().SetMapData( mapData );
+                    pc.GetComponent<PlayerController>().SetWallBlocks( wallBlocks );
+                }
             }
         }
 
@@ -46,9 +59,8 @@ namespace Bomberman
         {
             if ( _levelTime <= 0 )
             {
-                //show result
-
-                //enable restart button
+                PlayerPrefs.SetString( Constants.GAME_RESULT, Constants.GAME_DRAW );
+                UnityEngine.SceneManagement.SceneManager.LoadScene( "gameover" );
             }
             else
             {
@@ -56,9 +68,6 @@ namespace Bomberman
                 UpdateTimerText();
             }
         }
-        #endregion
-
-        #region map data
         #endregion
 
         #region UI
@@ -74,9 +83,21 @@ namespace Bomberman
         }
         #endregion
 
-        public void SetWallBlocks( List<GameObject> wallBlocks )
+        /// <summary>
+        /// cache refernce to block objects
+        /// </summary>
+        public void SetWallBlocks( List<BlockMapper> wallBlocks )
         {
             this.wallBlocks = wallBlocks;
+        }
+
+        /// <summary>
+        /// setup refs for player controllers
+        /// </summary>
+        public void SetPlayerControllers( GameObject p1, GameObject p2 )
+        {
+            playerControllers.Add( p1 );
+            playerControllers.Add( p2 );
         }
 
         /// <summary>

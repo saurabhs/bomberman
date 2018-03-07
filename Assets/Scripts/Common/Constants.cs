@@ -61,6 +61,24 @@ namespace Bomberman
         public List<TilesetData> tilesetData;
     }
 
+    /// <summary>
+    /// helper class because untiy cant 
+    /// update values from editor script 
+    /// unless the variable is exposed
+    /// </summary>
+    [System.Serializable]
+    public struct BlockMapper
+    {
+        [SerializeField] public int index;
+        [SerializeField] public GameObject tile;
+
+        public BlockMapper(int index, GameObject tile)
+        {
+            this.index = index;
+            this.tile = tile;
+        }
+    }
+
     public class Constants
     {
         public static int GROUND_ID = 0;
@@ -68,6 +86,16 @@ namespace Bomberman
         public static int INDESTRUCTABLE_WALL_ID = 2;
         public static int PLAYER1_ID = 3;
         public static int PLAYER2_ID = 4;
+
+        public static int SINGLEPLAYER_ID = 100;
+        public static int COOP_ID = 101;
+
+        public static string GAME_TYPE = "GAME_TYPE";
+        public static string GAME_RESULT = "GAME_RESULT";
+
+        public static string GAME_DRAW = "DRAW!!!";
+        public static string GAME_YANG = "YANG WINS!!!";
+        public static string GAME_YING = "YING WINS!!!";
     }
 
     public class Common
