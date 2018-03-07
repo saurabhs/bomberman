@@ -53,15 +53,18 @@ namespace Bomberman
             StartCoroutine( OnBombDetonate() );
         }
 
-        private void Explosion()
+        private IEnumerator Explosion(float delay = 0.5f)
         {
+            //create explosion at origin
+            CreateExplosion(new Point((int)transform.position.x, (int)transform.position.z));
+
             var currentGrid = new Point( Mathf.Abs( ( int )transform.position.x ), Mathf.Abs( ( int )transform.position.z ) );
 
             //check for grid extrems or if the next block is indestructible
-            var canMoveUp = (currentGrid.y - 1) >= 0 && mapData.data[currentGrid.x, currentGrid.y - 1] != 2;
-            var canMoveDown = (currentGrid.y + 1) < mapData.height && mapData.data[currentGrid.x, currentGrid.y + 1] != 2;
-            var canMoveRight = (currentGrid.x + 1) < mapData.width && mapData.data[currentGrid.x + 1, currentGrid.y] != 2;
-            var canMoveLeft = (currentGrid.x - 1) >= 0 && mapData.data[currentGrid.x - 1, currentGrid.y] != 2;
+            var canMoveUp = (currentGrid.y - 1) >= 0 && mapData.data[currentGrid.x, currentGrid.y - 1] != Constants.INDESTRUCTABLE_WALL_ID;
+            var canMoveDown = (currentGrid.y + 1) < mapData.height && mapData.data[currentGrid.x, currentGrid.y + 1] != Constants.INDESTRUCTABLE_WALL_ID;
+            var canMoveRight = (currentGrid.x + 1) < mapData.width && mapData.data[currentGrid.x + 1, currentGrid.y] != Constants.INDESTRUCTABLE_WALL_ID;
+            var canMoveLeft = (currentGrid.x - 1) >= 0 && mapData.data[currentGrid.x - 1, currentGrid.y] != Constants.INDESTRUCTABLE_WALL_ID;
 
             //add grids to be used for explosin and update for next block
             for ( var i = 1; i <= range; i++ )
@@ -71,68 +74,113 @@ namespace Bomberman
                 {
                     var point = new Point( ( int )transform.position.x, ( int )transform.position.z + i );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == 1;
+                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
                     //check if next point is valid
                     canMoveUp = point.y + 1 <= 0 &&
                                 !isCurrentBlockDestructibleWall &&
-                                mapData.data[point.x, Mathf.Abs( point.y ) - 1] != 2;
+                                mapData.data[point.x, Mathf.Abs( point.y ) - 1] != Constants.INDESTRUCTABLE_WALL_ID;
                 }
                 //down
                 if ( canMoveDown )
                 {
                     var point = new Point( ( int )transform.position.x, ( int )transform.position.z - i );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == 1;
+                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
 
                     //check if next point is valid
                     canMoveDown = Mathf.Abs( point.y ) + 1 < mapData.height &&
                                     !isCurrentBlockDestructibleWall &&
-                                    mapData.data[point.x, Mathf.Abs( point.y ) + 1] != 2;
+                                    mapData.data[point.x, Mathf.Abs( point.y ) + 1] != Constants.INDESTRUCTABLE_WALL_ID;
                 }
                 //right
                 if ( canMoveRight )
                 {
                     var point = new Point( ( int )transform.position.x + i, ( int )transform.position.z );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == 1;
+                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
                     //check if next point is valid
                     canMoveRight = point.x + 1 < mapData.width &&
                                     !isCurrentBlockDestructibleWall &&
-                                    mapData.data[point.x + 1, Mathf.Abs( point.y )] != 2;
+                                    mapData.data[point.x + 1, Mathf.Abs( point.y )] != Constants.INDESTRUCTABLE_WALL_ID;
                 }
                 //left
                 if ( canMoveLeft )
                 {
                     var point = new Point( ( int )transform.position.x - i, ( int )transform.position.z );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == 1;
+                    var isCurrentBlockDestructibleWall = mapData.data[point.x, Mathf.Abs( point.y )] == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
                     //check if next point is valid
                     canMoveLeft = point.x - 1 >= 0 &&
                                 !isCurrentBlockDestructibleWall &&
-                                mapData.data[point.x - 1, Mathf.Abs( point.y )] != 2;
+                                mapData.data[point.x - 1, Mathf.Abs( point.y )] != Constants.INDESTRUCTABLE_WALL_ID;
                 }
+
+                yield return new WaitForSeconds(delay);
             }
+
+            //post explosion cleanup
+            //explosion over, clear the grid
+            DestroyExplosionEffect();
+
+            parent.OnBombDetonateEnd();
+            Destroy(gameObject);
         }
 
         private void DestroyCurrentBlockAndUpdateMapData( bool isCurrentBlockDesWall, Point point )
         {
+            //create new explosion
+            CreateExplosion(point);
+
             if ( isCurrentBlockDesWall )
             {
-                mapData.data[point.x, Mathf.Abs( point.y )] = 0;
+                mapData.data[point.x, Mathf.Abs( point.y )] = Constants.GROUND_ID;
                 var index = point.x + (Mathf.Abs( point.y ) * mapData.width);
-                Destroy( wallBlocks[index] );
+
+                var listIndex = wallBlocks.FindIndex(obj => obj.index == index);
+                if (listIndex != -1)
+                {
+                    //destroy destructible wall
+                    Destroy( wallBlocks[listIndex].tile.gameObject );
+                    //remove from list
+                    wallBlocks.RemoveAt(listIndex);
+                }
             }
         }
 
-        public GameObject go;
+        /// <summary>
+        /// instantiate explosion
+        /// </summary>
+        //create new explosion
+        private void CreateExplosion(Point point)
+        {
+            var explosionEffect = Instantiate(explosionGO, new Vector3(point.x, 0, point.y), Quaternion.identity);
+            explosionEffect.name = "_explosion";
+            explosionsEffect.Add(explosionEffect);
+        }
+
+        private void DestroyExplosionEffect()
+        {
+            for (int i = 0; i < explosionsEffect.Count; i++)
+            {
+                Destroy(explosionsEffect[i].gameObject);
+            }
+
+            explosionsEffect.Clear();
+        }
+
+        /// <summary>
+        /// explsion placehodler,
+        /// pink cube for now
+        /// </summary>
+        public GameObject explosionGO;
 
         /// <summary>
         /// Response on player detonate the bomb
@@ -143,12 +191,7 @@ namespace Bomberman
             yield return new WaitForSeconds( detonateTime );
 
             parent.OnBombDetonateStart();
-            Explosion();
-
-            yield return new WaitForSeconds( cooldown );
-
-            parent.OnBombDetonateEnd();
-            Destroy( gameObject );
+            StartCoroutine(Explosion(0.1f));
         }
         #endregion
     }

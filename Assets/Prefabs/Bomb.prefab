@@ -96,4 +96,5 @@ MonoBehaviour:
   cooldown: 2
   detonateTime: 2
   range: 4
-  go: {fileID: 1024938107980846, guid: aa874796928495147ad79b00bc6106ad, type: 2}
+  explosionGO: {fileID: 1024938107980846, guid: aa874796928495147ad79b00bc6106ad,
+    type: 2}
