@@ -24,7 +24,7 @@ namespace Bomberman
         /// <summary>
         /// bomb drop state
         /// </summary>
-        private bool _isBombActive = false;
+        public bool isBombActive = false;
 
         /// <summary>
         /// grid data
@@ -123,7 +123,7 @@ namespace Bomberman
         #region Input
         private void DropBomb()
         {
-            if ( !_isBombActive && bombsInHand > 0 && Input.GetKeyDown( keyDropBomb ) )
+            if ( !isBombActive && bombsInHand > 0 && Input.GetKeyDown( keyDropBomb ) )
             {
                 Instantiate( bombGO, transform.position, Quaternion.identity ).StarDetonation( this, mapData, wallBlocks );
             }
@@ -171,13 +171,13 @@ namespace Bomberman
         #region combat
         public void OnBombDetonateStart()
         {
-            _isBombActive = !_isBombActive;
+            isBombActive = !isBombActive;
             bombsInHand--;
         }
 
         public void OnBombDetonateEnd()
         {
-            _isBombActive = !_isBombActive;
+            isBombActive = !isBombActive;
             bombsInHand++;
         }
 

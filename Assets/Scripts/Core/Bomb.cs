@@ -53,10 +53,10 @@ namespace Bomberman
             StartCoroutine( OnBombDetonate() );
         }
 
-        private IEnumerator Explosion(float delay = 0.5f)
+        private IEnumerator Explosion( float delay = 0.5f )
         {
             //create explosion at origin
-            CreateExplosion(new Point((int)transform.position.x, (int)transform.position.z));
+            CreateExplosion( new Point( ( int )transform.position.x, ( int )transform.position.z ) );
 
             var currentGrid = new Point( Mathf.Abs( ( int )transform.position.x ), Mathf.Abs( ( int )transform.position.z ) );
 
@@ -123,7 +123,7 @@ namespace Bomberman
                                 mapData.data[point.x - 1, Mathf.Abs( point.y )] != Constants.INDESTRUCTABLE_WALL_ID;
                 }
 
-                yield return new WaitForSeconds(delay);
+                yield return new WaitForSeconds( delay );
             }
 
             //post explosion cleanup
@@ -131,26 +131,26 @@ namespace Bomberman
             DestroyExplosionEffect();
 
             parent.OnBombDetonateEnd();
-            Destroy(gameObject);
+            Destroy( gameObject );
         }
 
         private void DestroyCurrentBlockAndUpdateMapData( bool isCurrentBlockDesWall, Point point )
         {
             //create new explosion
-            CreateExplosion(point);
+            CreateExplosion( point );
 
             if ( isCurrentBlockDesWall )
             {
                 mapData.data[point.x, Mathf.Abs( point.y )] = Constants.GROUND_ID;
                 var index = point.x + (Mathf.Abs( point.y ) * mapData.width);
 
-                var listIndex = wallBlocks.FindIndex(obj => obj.index == index);
-                if (listIndex != -1)
+                var listIndex = wallBlocks.FindIndex( obj => obj.index == index );
+                if ( listIndex != -1 )
                 {
                     //destroy destructible wall
                     Destroy( wallBlocks[listIndex].tile.gameObject );
                     //remove from list
-                    wallBlocks.RemoveAt(listIndex);
+                    wallBlocks.RemoveAt( listIndex );
                 }
             }
         }
@@ -159,18 +159,18 @@ namespace Bomberman
         /// instantiate explosion
         /// </summary>
         //create new explosion
-        private void CreateExplosion(Point point)
+        private void CreateExplosion( Point point )
         {
-            var explosionEffect = Instantiate(explosionGO, new Vector3(point.x, 0, point.y), Quaternion.identity);
+            var explosionEffect = Instantiate( explosionGO, new Vector3( point.x, 0, point.y ), Quaternion.identity );
             explosionEffect.name = "_explosion";
-            explosionsEffect.Add(explosionEffect);
+            explosionsEffect.Add( explosionEffect );
         }
 
         private void DestroyExplosionEffect()
         {
-            for (int i = 0; i < explosionsEffect.Count; i++)
+            for ( int i = 0; i < explosionsEffect.Count; i++ )
             {
-                Destroy(explosionsEffect[i].gameObject);
+                Destroy( explosionsEffect[i].gameObject );
             }
 
             explosionsEffect.Clear();
@@ -188,10 +188,11 @@ namespace Bomberman
         /// <returns></returns>
         private IEnumerator OnBombDetonate()
         {
+            parent.OnBombDetonateStart();
+
             yield return new WaitForSeconds( detonateTime );
 
-            parent.OnBombDetonateStart();
-            StartCoroutine(Explosion(0.1f));
+            StartCoroutine( Explosion( 0.1f ) );
         }
         #endregion
     }
