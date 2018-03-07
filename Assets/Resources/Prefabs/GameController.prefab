@@ -80,7 +80,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1360466333872968
 GameObject:
   m_ObjectHideFlags: 1
@@ -131,7 +131,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &114195400438213046
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -335,8 +335,16 @@ MonoBehaviour:
   mapData:
     height: 0
     width: 0
+    player1:
+      x: 0
+      y: 0
+    player2:
+      x: 0
+      y: 0
     tilesetData: []
   timerText: {fileID: 114413765891267702}
+  wallBlocks: []
+  playerControllers: []
 --- !u!114 &114849307781951144
 MonoBehaviour:
   m_ObjectHideFlags: 1
