@@ -76,10 +76,11 @@ namespace Bomberman
         /// </summary>
         private void UpdateTimerText()
         {
-            var min = (_levelTime / 60).ToString( "0" );
-            var sec = (_levelTime % 60).ToString( "0" );
+            var min = (( int )_levelTime / 60).ToString();
+            var sec = ( int )_levelTime % 60;
 
-            timerText.text = $"{min}:{sec}";
+            var secText = sec < 10 ? "0" : "";
+            timerText.text = $"{min} : {secText}{sec}";
         }
         #endregion
 
