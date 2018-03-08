@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Xml;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -42,7 +41,6 @@ namespace Bomberman
                         //add only dest wall blocks
                         if ( id == Constants.DESTRUCTABLE_WALL_ID )
                         {
-                            //wallBlocksDict.Add( index, tile );
                             wallBlocksMapper.Add( new BlockMapper( index, tile ) );
                         }
                     }
@@ -50,23 +48,6 @@ namespace Bomberman
                     index++;
                 }
             }
-
-            //delete old player prefabs
-            var playerControllers = FindObjectsOfType<PlayerController>();
-            if ( playerControllers != null && playerControllers.Length > 0 )
-            {
-                DestroyImmediate( playerControllers[0].gameObject );
-                DestroyImmediate( playerControllers[1].gameObject );
-            }
-
-            //create players
-            var playerGO = GetAsset( Constants.PLAYER1_ID );
-            var player1 = Instantiate( playerGO, new Vector3( mapData.player1.x, 0, -mapData.player1.y ), Quaternion.identity ) as GameObject;
-            player1.name = $"_{playerGO.name}_{index}";
-
-            playerGO = GetAsset( Constants.PLAYER2_ID );
-            var player2 = Instantiate( playerGO, new Vector3( mapData.player2.x, 0, -mapData.player2.y ), Quaternion.identity ) as GameObject;
-            player2.name = $"_{playerGO.name}_{index}";
 
             //delete old gameController
             var oldGameController = FindObjectOfType<GameController>();
@@ -78,8 +59,48 @@ namespace Bomberman
             //create new gameController object
             var gameController = Instantiate( Resources.Load( @"Prefabs\GameController" ) ) as GameObject;
             gameController.name = "_gameController";
-            gameController.GetComponent<GameController>().SetWallBlocks( wallBlocksMapper );
-            gameController.GetComponent<GameController>().SetPlayerControllers( player1, player2 );
+
+            //delete old player prefabs
+            var playerControllers = FindObjectsOfType<PlayerController>();
+            if ( playerControllers != null && playerControllers.Length > 0 )
+            {
+                for ( var i = playerControllers.Length - 1; i >= 0; i-- )
+                {
+                    DestroyImmediate( playerControllers[i].gameObject );
+                }
+            }
+
+            //create players
+            for ( var i = 0; i < mapData.players.Count; i++ )
+            {
+                var point = mapData.players[i];
+
+                var playerGO = GetAsset( Constants.PLAYER1_ID + i );
+                var player = Instantiate( playerGO, new Vector3( point.x, 0, -point.y ), Quaternion.identity ) as GameObject;
+                player.name = $"_{playerGO.name}_{index}";
+                player.GetComponent<PlayerController>().SetWallBlocks( wallBlocksMapper );
+
+                gameController.GetComponent<GameController>().AddPlayerController( player );
+            }
+
+            //delete old enemies
+            var enemies = FindObjectsOfType<AIController>();
+            if ( enemies != null && enemies.Length > 0 )
+            {
+                for ( var i = enemies.Length - 1; i >= 0; i-- )
+                {
+                    DestroyImmediate( enemies[i].gameObject );
+                }
+            }
+
+            //create new enemies
+            foreach ( var point in mapData.enemies )
+            {
+                var enemyGO = GetAsset( Constants.ENEMY_ID );
+                var enemy = Instantiate( enemyGO, new Vector3( point.x, 0, -point.y ), Quaternion.identity ) as GameObject;
+                enemy.name = $"_{enemyGO.name}_{index}";
+                enemy.GetComponent<AIController>().SetWallBlocks( wallBlocksMapper );
+            }
 
             //save scene 
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene( SceneManager.GetActiveScene() );
@@ -95,8 +116,12 @@ namespace Bomberman
                 return Resources.Load( @"Prefabs\IndestructableWall" ) as GameObject;
             else if ( index == Constants.PLAYER1_ID )
                 return Resources.Load( @"Prefabs\Ying" ) as GameObject;
-            else
+            else if ( index == Constants.PLAYER2_ID )
                 return Resources.Load( @"Prefabs\Yang" ) as GameObject;
+            else if ( index == Constants.ENEMY_ID )
+                return Resources.Load( @"Prefabs\Enemy" ) as GameObject;
+
+            return null;
         }
     }
 }
