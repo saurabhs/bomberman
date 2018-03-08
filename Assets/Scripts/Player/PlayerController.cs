@@ -83,7 +83,7 @@ namespace Bomberman
         private void OnTriggerEnter( Collider trigger )
         {
             PlayerPrefs.SetString( Constants.GAME_RESULT, (gameObject.name.Split( '_' )[1].ToLower().Equals( "yang" ) ? Constants.GAME_YING : Constants.GAME_YANG) );
-            //UnityEngine.SceneManagement.SceneManager.LoadScene( "gameover" );
+            UnityEngine.SceneManagement.SceneManager.LoadScene( "gameover" );
         }
         #endregion
 

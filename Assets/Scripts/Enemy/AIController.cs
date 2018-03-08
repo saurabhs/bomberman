@@ -99,7 +99,7 @@ namespace Bomberman
         private void OnTriggerEnter( Collider other )
         {
             //destroy this enemy on collsion with bomb explosion
-            //Destroy( gameObject );
+            Destroy( gameObject );
         }
         #endregion
     }
