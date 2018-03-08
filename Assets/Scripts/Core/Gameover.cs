@@ -13,8 +13,8 @@ namespace Bomberman
             //set result
             result.text = PlayerPrefs.GetString( Constants.GAME_RESULT );
 
-            //restart
-            restart.onClick.AddListener( () => UnityEngine.SceneManagement.SceneManager.LoadScene( $"map0{Random.Range( 1, 3 )}" ) );
+            //restart, - 1 for removing the gameover scene
+            restart.onClick.AddListener( () => UnityEngine.SceneManagement.SceneManager.LoadScene( $"map0{Random.Range( 1, UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings - 1 )}" ) );
         }
     }
 }
