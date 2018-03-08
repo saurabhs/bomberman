@@ -97,7 +97,7 @@ namespace Bomberman
             if ( canMove )
             {
                 nextPosition = transform.position;
-                MovementInput();
+                Move();
             }
 
             if ( isMoving )
@@ -106,7 +106,7 @@ namespace Bomberman
                 {
                     isMoving = false;
                     canMove = true;
-                    MovementInput();
+                    Move();
                 }
 
                 transform.position = Vector3.MoveTowards( transform.position, nextPosition, speed * Time.deltaTime );
@@ -129,7 +129,7 @@ namespace Bomberman
             }
         }
 
-        private void MovementInput()
+        private void Move()
         {
             if ( Input.GetKey( keyUp ) )
             {

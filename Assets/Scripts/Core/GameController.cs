@@ -6,15 +6,20 @@ namespace Bomberman
 {
     public class GameController : MonoBehaviour
     {
-        [SerializeField] private float _levelTime = 120f;
+        /// <summary>
+        /// time for which the level will run in seconds
+        /// </summary>
+        [SerializeField] private float levelTime = 120f;
 
         /// <summary>
         /// raw grid data
         /// </summary>
         public MapData mapData;
 
-        [Header( "UI" ), SerializeField]
-        private Text timerText;
+        /// <summary>
+        /// timer text gameobject ref 
+        /// </summary>
+        [SerializeField] private Text timerText;
 
         /// <summary>
         /// list for saving destructible wall go 
@@ -57,14 +62,14 @@ namespace Bomberman
 
         private void Update()
         {
-            if ( _levelTime <= 0 )
+            if ( levelTime <= 0 )
             {
                 PlayerPrefs.SetString( Constants.GAME_RESULT, Constants.GAME_DRAW );
                 UnityEngine.SceneManagement.SceneManager.LoadScene( "gameover" );
             }
             else
             {
-                _levelTime -= Time.deltaTime;
+                levelTime -= Time.deltaTime;
                 UpdateTimerText();
             }
         }
@@ -76,8 +81,8 @@ namespace Bomberman
         /// </summary>
         private void UpdateTimerText()
         {
-            var min = (( int )_levelTime / 60).ToString();
-            var sec = ( int )_levelTime % 60;
+            var min = (( int )levelTime / 60).ToString();
+            var sec = ( int )levelTime % 60;
 
             var secText = sec < 10 ? "0" : "";
             timerText.text = $"{min} : {secText}{sec}";

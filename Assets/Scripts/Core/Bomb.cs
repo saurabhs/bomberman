@@ -35,9 +35,15 @@ namespace Bomberman
         private List<BlockMapper> wallBlocks;
 
         /// <summary>
+        /// explsion placehodler,
+        /// pink cube for now
+        /// </summary>
+        public GameObject explosionGO;
+
+        /// <summary>
         /// objects created for explosion
         /// </summary>
-        List<GameObject> explosionsEffect = new List<GameObject>();
+        private List<GameObject> explosionsEffect = new List<GameObject>();
         #endregion
 
         #region combat
@@ -158,7 +164,6 @@ namespace Bomberman
         /// <summary>
         /// instantiate explosion
         /// </summary>
-        //create new explosion
         private void CreateExplosion( Point point )
         {
             var explosionEffect = Instantiate( explosionGO, new Vector3( point.x, 0, point.y ), Quaternion.identity );
@@ -166,6 +171,9 @@ namespace Bomberman
             explosionsEffect.Add( explosionEffect );
         }
 
+        /// <summary>
+        /// clear explosion objects
+        /// </summary>
         private void DestroyExplosionEffect()
         {
             for ( int i = 0; i < explosionsEffect.Count; i++ )
@@ -177,15 +185,8 @@ namespace Bomberman
         }
 
         /// <summary>
-        /// explsion placehodler,
-        /// pink cube for now
-        /// </summary>
-        public GameObject explosionGO;
-
-        /// <summary>
         /// Response on player detonate the bomb
         /// </summary>
-        /// <returns></returns>
         private IEnumerator OnBombDetonate()
         {
             parent.OnBombDetonateStart();
