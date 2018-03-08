@@ -13,6 +13,9 @@ namespace Bomberman
         private int absX;
         private int absY;
 
+        public int AbsX { get { return absX; } }
+        public int AbsY { get { return absY; } }
+
         public Point( int x, int y )
         {
             this.x = x;
@@ -56,9 +59,8 @@ namespace Bomberman
         public int height;
         public int width;
         public int[,] data;
-        public Point player1;
-        public Point player2;
-        public List<TilesetData> tilesetData;
+        public List<Point> players;
+        public List<Point> enemies;
     }
 
     /// <summary>
@@ -72,7 +74,7 @@ namespace Bomberman
         [SerializeField] public int index;
         [SerializeField] public GameObject tile;
 
-        public BlockMapper(int index, GameObject tile)
+        public BlockMapper( int index, GameObject tile )
         {
             this.index = index;
             this.tile = tile;
@@ -86,6 +88,7 @@ namespace Bomberman
         public static int INDESTRUCTABLE_WALL_ID = 2;
         public static int PLAYER1_ID = 3;
         public static int PLAYER2_ID = 4;
+        public static int ENEMY_ID = 5;
 
         public static int SINGLEPLAYER_ID = 100;
         public static int COOP_ID = 101;
@@ -120,17 +123,6 @@ namespace Bomberman
             if ( !int.TryParse( xmlData.Attributes["height"].Value.Trim(), out mapData.height ) )
                 throw new System.Exception( "Invalid Height value..." );
 
-            var tilesetsXMLData = xmlDocument.DocumentElement.SelectNodes( "/map/tileset" );
-            for ( var i = 0; i < tilesetsXMLData.Count; i++ )
-            {
-                if ( mapData.tilesetData == null )
-                    mapData.tilesetData = new List<TilesetData>();
-
-                var tilesetData = new TilesetData();
-                tilesetData.firstgid = int.Parse( tilesetsXMLData[i].Attributes["firstgid"].Value.Trim() );
-                mapData.tilesetData.Add( tilesetData );
-            }
-
             //read tile map data
             var dataNode = xmlDocument.DocumentElement.SelectSingleNode( "/map/layer[@name='Map']/data" );
             var tiles = dataNode.InnerText.Split( ',' );
@@ -150,17 +142,27 @@ namespace Bomberman
             tiles = dataNode.InnerText.Split( ',' );
             index = 0;
 
+            mapData.players = new List<Point>();
+            mapData.players.Add( new Point() );
+            mapData.players.Add( new Point() );
+
+            mapData.enemies = new List<Point>();
+
             for ( var j = 0; j < mapData.height; j++ )
             {
                 for ( var i = 0; i < mapData.width; i++ )
                 {
                     if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER1_ID )
                     {
-                        mapData.player1 = new Point( i, j );
+                        mapData.players[0] = (new Point( i, j ));
                     }
                     else if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER2_ID )
                     {
-                        mapData.player2 = new Point( i, j );
+                        mapData.players[1] = new Point( i, j );
+                    }
+                    else if ( int.Parse( tiles[index].Trim() ) == Constants.ENEMY_ID )
+                    {
+                        mapData.enemies.Add( new Point( i, j ) );
                     }
 
                     index++;
