@@ -26,7 +26,7 @@ Recreation of the classic Bomberman game
 
 **Next Steps**
 
-* The current version is coop only mode with no enemies, so the players fight between each other
-* From code perspective, finding next available blocks for explosion in Bomb class can be improved 
-* The grid is instantiated from oriign to negative z vertically and finding the grid value requires calculating its absoulute value
+* ~~The current version is coop only mode with no enemies, so the players fight between each other~~
+* From code perspective, finding next available blocks for explosion in Bomb class can be improved
+* The grid is instantiated from origin to negative z vertically and finding the grid value requires calculating its absoulute value
 * Power ups!
