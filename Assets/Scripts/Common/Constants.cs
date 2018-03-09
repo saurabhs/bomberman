@@ -99,6 +99,13 @@ namespace Bomberman
         public static string GAME_DRAW = "DRAW!!!";
         public static string GAME_YANG = "YANG WINS!!!";
         public static string GAME_YING = "YING WINS!!!";
+
+        public static int MAX_DETONATION_DELAY = 10;
+
+        public static LayerMask LAYER_DEFAULT = LayerMask.NameToLayer( "Default" );
+        public static LayerMask LAYER_ENEMY = LayerMask.NameToLayer( "Enemy" );
+        public static LayerMask LAYER_EXPLOSION = LayerMask.NameToLayer( "Explosion" );
+        public static LayerMask LAYER_POWERUP = LayerMask.NameToLayer( "Powerup" );
     }
 
     public class Common
