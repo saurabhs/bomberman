@@ -123,5 +123,17 @@ namespace Bomberman
 
             return null;
         }
+
+        [MenuItem( "Tools/Game Mode/Play Single player" )]
+        private static void SetSinglePlayerGameMode()
+        {
+            PlayerPrefs.SetInt( Constants.GAME_TYPE, Constants.SINGLEPLAYER_ID );
+        }
+
+        [MenuItem( "Tools/Game Mode/Play COOP" )]
+        private static void SetCoopGameMode()
+        {
+            PlayerPrefs.SetInt( Constants.GAME_TYPE, Constants.COOP_ID );
+        }
     }
 }
