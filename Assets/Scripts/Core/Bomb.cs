@@ -12,8 +12,6 @@ namespace Bomberman
         /// </summary>
         public PlayerController parent;
 
-        public float cooldown = 2f;
-
         /// <summary>
         /// detonate time
         /// </summary>
@@ -44,28 +42,68 @@ namespace Bomberman
         /// objects created for explosion
         /// </summary>
         private List<GameObject> explosionsEffect = new List<GameObject>();
+
+        /// <summary>
+        /// list of powerup to spawn from
+        /// </summary>
+        public List<GameObject> powerups;
+
+        /// <summary>
+        /// flag to spawn only one 
+        /// powerup for each bomb
+        /// </summary>
+        private bool hasSpawnedAPowerup = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private Coroutine bombExplosionRoutine = null;
+
+        #endregion
+
+        #region trigger response
+        private void OnTriggerEnter( Collider collider )
+        {
+            if ( collider.gameObject.layer == Constants.LAYER_EXPLOSION )
+            {
+                //remove layer to avoid generating multiple explosions
+                gameObject.layer = Constants.LAYER_DEFAULT;
+                collider.gameObject.layer = Constants.LAYER_DEFAULT;
+                ;
+
+                //is hit by explosion effect
+                StopCoroutine( bombExplosionRoutine );
+                StartCoroutine( Explosion( 0.1f ) );
+            }
+        }
         #endregion
 
         #region combat
         /// <summary>
         /// called from player after instantiation
         /// </summary>
-        public void StartDetonation( PlayerController parent, MapData mapData, List<BlockMapper> wallBlocks )
+        public Coroutine StartDetonation( PlayerController parent, MapData mapData, List<BlockMapper> wallBlocks, float rangeMultiplier = 1f, bool hasRemoteBomb = false )
         {
             this.parent = parent;
             this.mapData = mapData;
             this.wallBlocks = wallBlocks;
+            range = ( int )(range * rangeMultiplier);
 
-            StartCoroutine( OnBombDetonate() );
+            //increase max time to detonate to 10s
+            //incase the player doesn't activate manually
+            if ( hasRemoteBomb )
+                detonateTime = Constants.MAX_DETONATION_DELAY;
+
+            bombExplosionRoutine = StartCoroutine( OnBombDetonate() );
+            return bombExplosionRoutine;
         }
 
-        private IEnumerator Explosion( float delay = 0.5f )
+        public IEnumerator Explosion( float delay = 0.5f )
         {
             //create explosion at origin
-            var origin = new Point( ( int )transform.position.x, ( int )transform.position.z );
-            CreateExplosion( origin );
+            CreateExplosion( new Point( ( int )transform.position.x, ( int )transform.position.z ) );
 
-            var currentGrid = origin.GetAbs();
+            var currentGrid = new Point( Mathf.Abs( ( int )transform.position.x ), Mathf.Abs( ( int )transform.position.z ) );
 
             //check for grid extrems or if the next block is indestructible
             var canMoveUp = (currentGrid.y - 1) >= 0 && mapData.data[currentGrid.x, currentGrid.y - 1] != Constants.INDESTRUCTABLE_WALL_ID;
@@ -158,7 +196,33 @@ namespace Bomberman
                     Destroy( wallBlocks[listIndex].tile.gameObject );
                     //remove from list
                     wallBlocks.RemoveAt( listIndex );
+
+                    SpawnPowerup( point );
                 }
+            }
+        }
+
+        /// <summary>
+        /// spawns powerup if none has
+        /// spawn yet at 33% spawn rate
+        /// </summary>
+        private void SpawnPowerup( Point point )
+        {
+            //33% chances of a destructible wall spawning a powerup
+            if ( Random.Range( 0, 100 ) % 3 == 0 && !hasSpawnedAPowerup )
+            {
+                hasSpawnedAPowerup = true;
+
+                //get a random powerup
+                var powerupGO = powerups[Random.Range( 0, powerups.Count )];
+
+                //Instantiate and place at the broken wall
+                var powerup = Instantiate( powerupGO, new Vector3( point.x, 0, point.y ), powerupGO.transform.rotation );
+                powerup.name = $"{powerupGO.name}";
+
+                //destroy if the powerup is not
+                //picked up in the given time window
+                Destroy( powerup, powerupGO.GetComponent<Powerup>().lifetime );
             }
         }
 
