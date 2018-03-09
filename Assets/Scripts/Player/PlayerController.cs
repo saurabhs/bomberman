@@ -51,7 +51,7 @@ namespace Bomberman
         {
             if ( !isBombActive && bombsInHand > 0 && Input.GetKeyDown( keyDropBomb ) )
             {
-                Instantiate( bombGO, transform.position, Quaternion.identity ).StarDetonation( this, mapData, wallBlocks );
+                Instantiate( bombGO, transform.position, Quaternion.identity ).StartDetonation( this, mapData, wallBlocks );
             }
         }
 
