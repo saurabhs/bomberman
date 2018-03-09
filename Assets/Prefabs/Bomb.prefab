@@ -93,8 +93,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 0}
-  cooldown: 2
   detonateTime: 2
   range: 4
   explosionGO: {fileID: 1024938107980846, guid: aa874796928495147ad79b00bc6106ad,
     type: 2}
+  powerups:
+  - {fileID: 1527257802037372, guid: 79d615151b4200943966d1231c413aa1, type: 2}
+  - {fileID: 1527257802037372, guid: 8586e512c2fba364b844a490a7296526, type: 2}
+  - {fileID: 1527257802037372, guid: b34b80f3e6469af4c8e4eb722b92480d, type: 2}
+  - {fileID: 1527257802037372, guid: 5b9001e130f92e145a8da0d7cf8fc3f1, type: 2}
