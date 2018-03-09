@@ -80,7 +80,7 @@ namespace Bomberman
                 player.name = $"_{playerGO.name}_{index}";
                 player.GetComponent<PlayerController>().SetWallBlocks( wallBlocksMapper );
 
-                gameController.GetComponent<GameController>().AddPlayerController( player );
+                gameController.GetComponent<GameController>().AddPlayerController(player.GetComponent<PlayerController>());
             }
 
             //delete old enemies
