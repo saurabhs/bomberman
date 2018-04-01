@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,7 +18,7 @@ namespace Bomberman
                 DestroyImmediate( oldWorld );
             }
 
-            var mapData = Common.GetMapData( SceneManager.GetActiveScene().name );
+            var mapData = GetMapData( SceneManager.GetActiveScene().name );
             var worldParent = new GameObject( "_World" );
             worldParent.tag = "World";
 
@@ -29,7 +30,7 @@ namespace Bomberman
             {
                 for ( var i = 0; i < mapData.width; i++ )
                 {
-                    var id = mapData.data[i, j];
+                    var id = mapData.GetValue( i, j );
                     if ( id != 0 )
                     {
                         var go = GetAsset( id );
@@ -78,9 +79,11 @@ namespace Bomberman
                 var playerGO = GetAsset( Constants.PLAYER1_ID + i );
                 var player = Instantiate( playerGO, new Vector3( point.x, 0, -point.y ), Quaternion.identity ) as GameObject;
                 player.name = $"_{playerGO.name}_{index}";
-                player.GetComponent<PlayerController>().SetWallBlocks( wallBlocksMapper );
+                var playerController = player.GetComponent<PlayerController>();
+                playerController.SetWallBlocks( wallBlocksMapper );
+                playerController.SetMapData( mapData );
 
-                gameController.GetComponent<GameController>().AddPlayerController(player.GetComponent<PlayerController>());
+                gameController.GetComponent<GameController>().AddPlayerController( player.GetComponent<PlayerController>() );
             }
 
             //delete old enemies
@@ -99,7 +102,9 @@ namespace Bomberman
                 var enemyGO = GetAsset( Constants.ENEMY_ID );
                 var enemy = Instantiate( enemyGO, new Vector3( point.x, 0, -point.y ), Quaternion.identity ) as GameObject;
                 enemy.name = $"_{enemyGO.name}_{index}";
-                enemy.GetComponent<AIController>().SetWallBlocks( wallBlocksMapper );
+                var aiController = enemy.GetComponent<AIController>();
+                aiController.SetWallBlocks( wallBlocksMapper );
+                aiController.SetMapData( mapData );
             }
 
             //save scene 
@@ -134,6 +139,89 @@ namespace Bomberman
         private static void SetCoopGameMode()
         {
             PlayerPrefs.SetInt( Constants.GAME_TYPE, Constants.COOP_ID );
+        }
+
+        public static MapData GetMapData( string filePath )
+        {
+            return ReadMapDataFromTMXFile( GetXMLDocument( filePath ) );
+        }
+
+        private static MapData ReadMapDataFromTMXFile( XmlDocument xmlDocument )
+        {
+            var mapData = new MapData();
+
+            //read metadata
+            var xmlData = xmlDocument.DocumentElement.SelectSingleNode( "/map" );
+            if ( xmlData == null )
+                throw new System.Exception( "Invalid XML Data..." );
+
+            if ( !int.TryParse( xmlData.Attributes["width"].Value.Trim(), out mapData.width ) )
+                throw new System.Exception( "Invalid Width value..." );
+
+            if ( !int.TryParse( xmlData.Attributes["height"].Value.Trim(), out mapData.height ) )
+                throw new System.Exception( "Invalid Height value..." );
+
+            //read tile map data
+            var dataNode = xmlDocument.DocumentElement.SelectSingleNode( "/map/layer[@name='Map']/data" );
+            var tiles = dataNode.InnerText.Split( ',' );
+            var index = 0;
+
+            mapData.tiledata = new List<TileDataMapper>();
+            for ( var j = 0; j < mapData.height; j++ )
+            {
+                for ( var i = 0; i < mapData.width; i++ )
+                {
+                    mapData.tiledata.Add( new TileDataMapper( i, j, int.Parse( tiles[index++].Trim() ) ) );
+                }
+            }
+
+            //players layer
+            dataNode = xmlDocument.DocumentElement.SelectSingleNode( "/map/layer[@name='Players']/data" );
+            tiles = dataNode.InnerText.Split( ',' );
+            index = 0;
+
+            mapData.players = new List<Point>
+            {
+                new Point(),
+                new Point()
+            };
+
+            mapData.enemies = new List<Point>();
+
+            for ( var j = 0; j < mapData.height; j++ )
+            {
+                for ( var i = 0; i < mapData.width; i++ )
+                {
+                    if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER1_ID )
+                    {
+                        mapData.players[0] = (new Point( i, j ));
+                    }
+                    else if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER2_ID )
+                    {
+                        mapData.players[1] = new Point( i, j );
+                    }
+                    else if ( int.Parse( tiles[index].Trim() ) == Constants.ENEMY_ID )
+                    {
+                        mapData.enemies.Add( new Point( i, j ) );
+                    }
+
+                    index++;
+                }
+            }
+
+            return mapData;
+        }
+
+        private static XmlDocument GetXMLDocument( string filename )
+        {
+            var filePath = Application.dataPath + @"/Resources/Tilemaps/" + filename + @".xml";
+            if ( !System.IO.File.Exists( filePath ) )
+                return null;
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load( filePath );
+
+            return xmlDocument;
         }
     }
 }

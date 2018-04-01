@@ -36,26 +36,26 @@ namespace Bomberman
         #region unity lifecycle
         private void Start()
         {
-            if (playerControllers == null || playerControllers.Count == 0)
-                throw new System.Exception("Cannot find any playerController references.");
+            if ( playerControllers == null || playerControllers.Count == 0 )
+                throw new System.Exception( "Cannot find any playerController references." );
 
             //enable yang for coop match
             bool isSinglePlayer = false;
-            if (isSinglePlayer = PlayerPrefs.GetInt(Constants.GAME_TYPE, Constants.COOP_ID) != Constants.COOP_ID)
+            if ( isSinglePlayer = PlayerPrefs.GetInt( Constants.GAME_TYPE, Constants.COOP_ID ) != Constants.COOP_ID )
             {
-                playerControllers[1].gameObject.SetActive(!isSinglePlayer);
-                playersBombCountText[1].gameObject.SetActive(false);
-                playersPowerText[1].gameObject.SetActive(false);
-                playerControllers.RemoveAt(1);
+                playerControllers[1].gameObject.SetActive( !isSinglePlayer );
+                playersBombCountText[1].gameObject.SetActive( false );
+                playersPowerText[1].gameObject.SetActive( false );
+                playerControllers.RemoveAt( 1 );
             }
         }
 
         private void Update()
         {
-            if (levelTime <= 0)
+            if ( levelTime <= 0 )
             {
-                PlayerPrefs.SetString(Constants.GAME_RESULT, Constants.GAME_DRAW);
-                UnityEngine.SceneManagement.SceneManager.LoadScene("gameover");
+                PlayerPrefs.SetString( Constants.GAME_RESULT, Constants.GAME_DRAW );
+                UnityEngine.SceneManagement.SceneManager.LoadScene( "gameover" );
             }
             else
             {
@@ -72,8 +72,8 @@ namespace Bomberman
         /// </summary>
         private void UpdateTimerText()
         {
-            var min = ((int)levelTime / 60).ToString();
-            var sec = (int)levelTime % 60;
+            var min = (( int )levelTime / 60).ToString();
+            var sec = ( int )levelTime % 60;
 
             var secText = sec < 10 ? "0" : "";
             timerText.text = $"{min} : {secText}{sec}";
@@ -81,7 +81,7 @@ namespace Bomberman
 
         private void UpdateBombCountText()
         {
-            for (var i = 0; i < playerControllers.Count; i++)
+            for ( var i = 0; i < playerControllers.Count; i++ )
             {
                 playersBombCountText[i].text = $"{playerControllers[i].bombsInHand}";
                 playersPowerText[i].text = $"{playerControllers[i].powerupName}";
@@ -94,9 +94,9 @@ namespace Bomberman
         /// <summary>
         /// setup refs for player controllers
         /// </summary>
-        public void AddPlayerController(PlayerController player)
+        public void AddPlayerController( PlayerController player )
         {
-            playerControllers.Add(player);
+            playerControllers.Add( player );
         }
 
         /// <summary>

@@ -37,6 +37,21 @@ namespace Bomberman
     }
 
     [System.Serializable]
+    public struct TileDataMapper
+    {
+        [SerializeField] public int i;
+        [SerializeField] public int j;
+        [SerializeField] public int value;
+
+        public TileDataMapper( int i, int j, int value )
+        {
+            this.i = i;
+            this.j = j;
+            this.value = value;
+        }
+    }
+
+    [System.Serializable]
     public struct TilesetData
     {
         public string prefix;
@@ -49,9 +64,30 @@ namespace Bomberman
     {
         public int height;
         public int width;
-        public int[,] data;
+        public List<TileDataMapper> tiledata;
         public List<Point> players;
         public List<Point> enemies;
+
+        //public void Set2DArrayFromTileDataMapper()
+        //{
+        //    data = new int[width, height];
+        //    foreach ( var item in tiledata )
+        //    {
+        //        data[item.i, item.j] = item.value;
+        //    }
+        //}
+
+        public void SetValue( int i, int j, int value )
+        {
+            var index = i * width + j;
+            tiledata[index] = new TileDataMapper( i, j, value );
+        }
+
+        public int GetValue( int i, int j )
+        {
+            var index = i * width + j;
+            return tiledata[index].value;
+        }
     }
 
     /// <summary>
@@ -97,92 +133,5 @@ namespace Bomberman
         public static LayerMask LAYER_ENEMY = LayerMask.NameToLayer( "Enemy" );
         public static LayerMask LAYER_EXPLOSION = LayerMask.NameToLayer( "Explosion" );
         public static LayerMask LAYER_POWERUP = LayerMask.NameToLayer( "Powerup" );
-    }
-
-    public class Common
-    {
-        public static MapData GetMapData( string filePath )
-        {
-            return ReadMapDataFromTMXFile( GetXMLDocument( filePath ) );
-        }
-
-        private static MapData ReadMapDataFromTMXFile( XmlDocument xmlDocument )
-        {
-            var mapData = new MapData();
-
-            //read metadata
-            var xmlData = xmlDocument.DocumentElement.SelectSingleNode( "/map" );
-            if ( xmlData == null )
-                throw new System.Exception( "Invalid XML Data..." );
-
-            if ( !int.TryParse( xmlData.Attributes["width"].Value.Trim(), out mapData.width ) )
-                throw new System.Exception( "Invalid Width value..." );
-
-            if ( !int.TryParse( xmlData.Attributes["height"].Value.Trim(), out mapData.height ) )
-                throw new System.Exception( "Invalid Height value..." );
-
-            //read tile map data
-            var dataNode = xmlDocument.DocumentElement.SelectSingleNode( "/map/layer[@name='Map']/data" );
-            var tiles = dataNode.InnerText.Split( ',' );
-            var index = 0;
-
-            mapData.data = new int[mapData.width, mapData.height];
-            for ( var j = 0; j < mapData.height; j++ )
-            {
-                for ( var i = 0; i < mapData.width; i++ )
-                {
-                    mapData.data[i, j] = int.Parse( tiles[index++].Trim() );
-                }
-            }
-
-            //players layer
-            dataNode = xmlDocument.DocumentElement.SelectSingleNode( "/map/layer[@name='Players']/data" );
-            tiles = dataNode.InnerText.Split( ',' );
-            index = 0;
-
-            mapData.players = new List<Point>
-            {
-                new Point(),
-                new Point()
-            };
-
-            mapData.enemies = new List<Point>();
-
-            for ( var j = 0; j < mapData.height; j++ )
-            {
-                for ( var i = 0; i < mapData.width; i++ )
-                {
-                    if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER1_ID )
-                    {
-                        mapData.players[0] = (new Point( i, j ));
-                    }
-                    else if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER2_ID )
-                    {
-                        mapData.players[1] = new Point( i, j );
-                    }
-                    else if ( int.Parse( tiles[index].Trim() ) == Constants.ENEMY_ID )
-                    {
-                        mapData.enemies.Add( new Point( i, j ) );
-                    }
-
-                    index++;
-                }
-            }
-
-            return mapData;
-        }
-
-        private static XmlDocument GetXMLDocument( string filename )
-        {
-            var filePath = Application.dataPath + @"/Resources/Tilemaps/" + filename + @".xml";
-
-            if ( !System.IO.File.Exists( filePath ) )
-                return null;
-
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load( filePath );
-
-            return xmlDocument;
-        }
     }
 }

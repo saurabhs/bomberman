@@ -59,7 +59,7 @@ namespace Bomberman
         #region unity lifecycle
         private void Awake()
         {
-            SetMapData();
+            //mapData.Set2DArrayFromTileDataMapper();
             bombsInHand = 1;
         }
 

@@ -24,7 +24,7 @@ namespace Bomberman
         /// <summary>
         /// grid data
         /// </summary>
-        protected MapData mapData;
+        [SerializeField] protected MapData mapData;
 
         /// <summary>
         /// next move position
@@ -42,10 +42,10 @@ namespace Bomberman
         /// <summary>
         /// cache grid data
         /// </summary>
-        public void SetMapData()
+        public void SetMapData( MapData mapData )
         {
             //cache grid data
-            mapData = Common.GetMapData( UnityEngine.SceneManagement.SceneManager.GetActiveScene().name );
+            this.mapData = mapData;
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Bomberman
         protected bool IsValidMove( Point point )
         {
             return (point.x >= 0 && point.x < mapData.width && point.y <= 0 && point.AbsY < mapData.height) &&
-                (mapData.data[point.AbsX, point.AbsY] == 0 || (mapData.data[point.AbsX, point.AbsY]) > Constants.INDESTRUCTABLE_WALL_ID);
+                (mapData.GetValue( point.AbsX, point.AbsY ) == 0 || (mapData.GetValue( point.AbsX, point.AbsY )) > Constants.INDESTRUCTABLE_WALL_ID);
         }
 
         /// <summary>
