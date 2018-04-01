@@ -10,33 +10,24 @@ namespace Bomberman
         public int x;
         public int y;
 
-        private int absX;
-        private int absY;
-
-        public int AbsX { get { return absX; } }
-        public int AbsY { get { return absY; } }
+        public int AbsX { get { return Mathf.Abs( x ); } }
+        public int AbsY { get { return Mathf.Abs( y ); } }
 
         public Point( int x, int y )
         {
             this.x = x;
             this.y = y;
-
-            absX = Mathf.Abs( x );
-            absY = Mathf.Abs( y );
         }
 
         public Point( Vector3 position )
         {
             x = ( int )position.x;
             y = ( int )position.z;
-
-            absX = Mathf.Abs( x );
-            absY = Mathf.Abs( y );
         }
 
         public Point GetAbs()
         {
-            return new Point( absX, absY );
+            return new Point( AbsX, AbsY );
         }
 
         public override string ToString()
@@ -149,9 +140,11 @@ namespace Bomberman
             tiles = dataNode.InnerText.Split( ',' );
             index = 0;
 
-            mapData.players = new List<Point>();
-            mapData.players.Add( new Point() );
-            mapData.players.Add( new Point() );
+            mapData.players = new List<Point>
+            {
+                new Point(),
+                new Point()
+            };
 
             mapData.enemies = new List<Point>();
 
