@@ -181,7 +181,7 @@ namespace Bomberman
 
         private static XmlDocument GetXMLDocument( string filename )
         {
-            var filePath = Application.dataPath + @"/Resources/Tilemaps/" + filename + @".tmx";
+            var filePath = Application.dataPath + @"/Resources/Tilemaps/" + filename + @".xml";
 
             if ( !System.IO.File.Exists( filePath ) )
                 return null;
