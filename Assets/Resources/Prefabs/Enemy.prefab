@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09ed8694e09c72e4f951056e556eeed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
+  speed: 5
   wallBlocks: []
   direction: 0
   axis: 0
