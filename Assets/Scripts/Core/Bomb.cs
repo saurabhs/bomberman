@@ -46,7 +46,7 @@ namespace Bomberman
         /// <summary>
         /// list of powerup to spawn from
         /// </summary>
-        public List<GameObject> powerups;
+        public List<GameObject> powerups = new List<GameObject>();
 
         /// <summary>
         /// flag to spawn only one 
@@ -61,6 +61,14 @@ namespace Bomberman
 
         #endregion
 
+        #region unity lifecycle 
+        private void Start()
+        {
+            if ( powerups == null || powerups.Count == 0 )
+                throw new System.Exception( "Invalid powerups collection." );
+        }
+        #endregion
+
         #region trigger response
         private void OnTriggerEnter( Collider collider )
         {
@@ -69,7 +77,6 @@ namespace Bomberman
                 //remove layer to avoid generating multiple explosions
                 gameObject.layer = Constants.LAYER_DEFAULT;
                 collider.gameObject.layer = Constants.LAYER_DEFAULT;
-                ;
 
                 //is hit by explosion effect
                 StopCoroutine( bombExplosionRoutine );

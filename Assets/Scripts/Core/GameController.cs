@@ -40,7 +40,7 @@ namespace Bomberman
                 throw new System.Exception( "Cannot find any playerController references." );
 
             //enable yang for coop match
-            bool isSinglePlayer = false;
+            var isSinglePlayer = false;
             if ( isSinglePlayer = PlayerPrefs.GetInt( Constants.GAME_TYPE, Constants.COOP_ID ) != Constants.COOP_ID )
             {
                 playerControllers[1].gameObject.SetActive( !isSinglePlayer );
