@@ -337,7 +337,11 @@ proprietary programs.  If your program is a subroutine library, you may
 consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Lesser General
 <<<<<<< HEAD
+<<<<<<< HEAD
 Public License instead of this License.
+=======
+Public License instead of this License.
+>>>>>>> 0ba915b15437676f71d22d1b2492dacd520220c6
 =======
 Public License instead of this License.
 >>>>>>> 0ba915b15437676f71d22d1b2492dacd520220c6
