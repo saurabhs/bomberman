@@ -37,7 +37,7 @@ namespace Bomberman
     }
 
     [System.Serializable]
-    public struct TileDataMapper
+    public class TileDataMapper
     {
         [SerializeField] public int i;
         [SerializeField] public int j;
@@ -79,13 +79,13 @@ namespace Bomberman
 
         public void SetValue( int i, int j, int value )
         {
-            var index = i * width + j;
+            var index = i + j * width;
             tiledata[index] = new TileDataMapper( i, j, value );
         }
 
         public int GetValue( int i, int j )
         {
-            var index = i * width + j;
+            var index = i + j * width;
             return tiledata[index].value;
         }
     }
