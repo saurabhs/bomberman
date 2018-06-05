@@ -10,38 +10,44 @@ namespace Bomberman
         public int x;
         public int y;
 
-        private int absX;
-        private int absY;
-
-        public int AbsX { get { return absX; } }
-        public int AbsY { get { return absY; } }
+        public int AbsX { get { return Mathf.Abs( x ); } }
+        public int AbsY { get { return Mathf.Abs( y ); } }
 
         public Point( int x, int y )
         {
             this.x = x;
             this.y = y;
-
-            absX = Mathf.Abs( x );
-            absY = Mathf.Abs( y );
         }
 
         public Point( Vector3 position )
         {
             x = ( int )position.x;
             y = ( int )position.z;
-
-            absX = Mathf.Abs( x );
-            absY = Mathf.Abs( y );
         }
 
         public Point GetAbs()
         {
-            return new Point( absX, absY );
+            return new Point( AbsX, AbsY );
         }
 
         public override string ToString()
         {
             return $"({x}, {y})";
+        }
+    }
+
+    [System.Serializable]
+    public class TileDataMapper
+    {
+        [SerializeField] public int i;
+        [SerializeField] public int j;
+        [SerializeField] public int value;
+
+        public TileDataMapper( int i, int j, int value )
+        {
+            this.i = i;
+            this.j = j;
+            this.value = value;
         }
     }
 
@@ -58,9 +64,30 @@ namespace Bomberman
     {
         public int height;
         public int width;
-        public int[,] data;
+        public List<TileDataMapper> tiledata;
         public List<Point> players;
         public List<Point> enemies;
+
+        //public void Set2DArrayFromTileDataMapper()
+        //{
+        //    data = new int[width, height];
+        //    foreach ( var item in tiledata )
+        //    {
+        //        data[item.i, item.j] = item.value;
+        //    }
+        //}
+
+        public void SetValue( int i, int j, int value )
+        {
+            var index = i + j * width;
+            tiledata[index] = new TileDataMapper( i, j, value );
+        }
+
+        public int GetValue( int i, int j )
+        {
+            var index = i + j * width;
+            return tiledata[index].value;
+        }
     }
 
     /// <summary>
@@ -106,90 +133,5 @@ namespace Bomberman
         public static LayerMask LAYER_ENEMY = LayerMask.NameToLayer( "Enemy" );
         public static LayerMask LAYER_EXPLOSION = LayerMask.NameToLayer( "Explosion" );
         public static LayerMask LAYER_POWERUP = LayerMask.NameToLayer( "Powerup" );
-    }
-
-    public class Common
-    {
-        public static MapData GetMapData( string filePath )
-        {
-            return ReadMapDataFromTMXFile( GetXMLDocument( filePath ) );
-        }
-
-        private static MapData ReadMapDataFromTMXFile( XmlDocument xmlDocument )
-        {
-            var mapData = new MapData();
-
-            //read metadata
-            var xmlData = xmlDocument.DocumentElement.SelectSingleNode( "/map" );
-            if ( xmlData == null )
-                throw new System.Exception( "Invalid XML Data..." );
-
-            if ( !int.TryParse( xmlData.Attributes["width"].Value.Trim(), out mapData.width ) )
-                throw new System.Exception( "Invalid Width value..." );
-
-            if ( !int.TryParse( xmlData.Attributes["height"].Value.Trim(), out mapData.height ) )
-                throw new System.Exception( "Invalid Height value..." );
-
-            //read tile map data
-            var dataNode = xmlDocument.DocumentElement.SelectSingleNode( "/map/layer[@name='Map']/data" );
-            var tiles = dataNode.InnerText.Split( ',' );
-            var index = 0;
-
-            mapData.data = new int[mapData.width, mapData.height];
-            for ( var j = 0; j < mapData.height; j++ )
-            {
-                for ( var i = 0; i < mapData.width; i++ )
-                {
-                    mapData.data[i, j] = int.Parse( tiles[index++].Trim() );
-                }
-            }
-
-            //players layer
-            dataNode = xmlDocument.DocumentElement.SelectSingleNode( "/map/layer[@name='Players']/data" );
-            tiles = dataNode.InnerText.Split( ',' );
-            index = 0;
-
-            mapData.players = new List<Point>();
-            mapData.players.Add( new Point() );
-            mapData.players.Add( new Point() );
-
-            mapData.enemies = new List<Point>();
-
-            for ( var j = 0; j < mapData.height; j++ )
-            {
-                for ( var i = 0; i < mapData.width; i++ )
-                {
-                    if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER1_ID )
-                    {
-                        mapData.players[0] = (new Point( i, j ));
-                    }
-                    else if ( int.Parse( tiles[index].Trim() ) == Constants.PLAYER2_ID )
-                    {
-                        mapData.players[1] = new Point( i, j );
-                    }
-                    else if ( int.Parse( tiles[index].Trim() ) == Constants.ENEMY_ID )
-                    {
-                        mapData.enemies.Add( new Point( i, j ) );
-                    }
-
-                    index++;
-                }
-            }
-
-            return mapData;
-        }
-
-        private static XmlDocument GetXMLDocument( string filename )
-        {
-            var filePath = Application.dataPath + @"/Resources/Tilemaps/" + filename + @".tmx";
-
-            if ( !System.IO.File.Exists( filePath ) )
-                return null;
-
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load( filePath );
-
-            return xmlDocument;
-        }
     }
 }

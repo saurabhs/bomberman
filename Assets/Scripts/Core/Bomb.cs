@@ -46,7 +46,7 @@ namespace Bomberman
         /// <summary>
         /// list of powerup to spawn from
         /// </summary>
-        public List<GameObject> powerups;
+        public List<GameObject> powerups = new List<GameObject>();
 
         /// <summary>
         /// flag to spawn only one 
@@ -61,6 +61,14 @@ namespace Bomberman
 
         #endregion
 
+        #region unity lifecycle 
+        private void Start()
+        {
+            if ( powerups == null || powerups.Count == 0 )
+                throw new System.Exception( "Invalid powerups collection." );
+        }
+        #endregion
+
         #region trigger response
         private void OnTriggerEnter( Collider collider )
         {
@@ -69,7 +77,6 @@ namespace Bomberman
                 //remove layer to avoid generating multiple explosions
                 gameObject.layer = Constants.LAYER_DEFAULT;
                 collider.gameObject.layer = Constants.LAYER_DEFAULT;
-                ;
 
                 //is hit by explosion effect
                 StopCoroutine( bombExplosionRoutine );
@@ -106,10 +113,10 @@ namespace Bomberman
             var currentGrid = new Point( Mathf.Abs( ( int )transform.position.x ), Mathf.Abs( ( int )transform.position.z ) );
 
             //check for grid extrems or if the next block is indestructible
-            var canMoveUp = (currentGrid.y - 1) >= 0 && mapData.data[currentGrid.x, currentGrid.y - 1] != Constants.INDESTRUCTABLE_WALL_ID;
-            var canMoveDown = (currentGrid.y + 1) < mapData.height && mapData.data[currentGrid.x, currentGrid.y + 1] != Constants.INDESTRUCTABLE_WALL_ID;
-            var canMoveRight = (currentGrid.x + 1) < mapData.width && mapData.data[currentGrid.x + 1, currentGrid.y] != Constants.INDESTRUCTABLE_WALL_ID;
-            var canMoveLeft = (currentGrid.x - 1) >= 0 && mapData.data[currentGrid.x - 1, currentGrid.y] != Constants.INDESTRUCTABLE_WALL_ID;
+            var canMoveUp = (currentGrid.y - 1) >= 0 && mapData.GetValue( currentGrid.x, currentGrid.y - 1 ) != Constants.INDESTRUCTABLE_WALL_ID;
+            var canMoveDown = (currentGrid.y + 1) < mapData.height && mapData.GetValue( currentGrid.x, currentGrid.y + 1 ) != Constants.INDESTRUCTABLE_WALL_ID;
+            var canMoveRight = (currentGrid.x + 1) < mapData.width && mapData.GetValue( currentGrid.x + 1, currentGrid.y ) != Constants.INDESTRUCTABLE_WALL_ID;
+            var canMoveLeft = (currentGrid.x - 1) >= 0 && mapData.GetValue( currentGrid.x - 1, currentGrid.y ) != Constants.INDESTRUCTABLE_WALL_ID;
 
             //add grids to be used for explosin and update for next block
             for ( var i = 1; i <= range; i++ )
@@ -119,53 +126,53 @@ namespace Bomberman
                 {
                     var point = new Point( ( int )transform.position.x, ( int )transform.position.z + i );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, point.AbsY] == Constants.DESTRUCTABLE_WALL_ID;
+                    var isCurrentBlockDestructibleWall = mapData.GetValue( point.x, point.AbsY ) == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
                     //check if next point is valid
                     canMoveUp = point.y + 1 <= 0 &&
                                 !isCurrentBlockDestructibleWall &&
-                                mapData.data[point.x, point.AbsY - 1] != Constants.INDESTRUCTABLE_WALL_ID;
+                                mapData.GetValue( point.x, point.AbsY - 1 ) != Constants.INDESTRUCTABLE_WALL_ID;
                 }
                 //down
                 if ( canMoveDown )
                 {
                     var point = new Point( ( int )transform.position.x, ( int )transform.position.z - i );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, point.AbsY] == Constants.DESTRUCTABLE_WALL_ID;
+                    var isCurrentBlockDestructibleWall = mapData.GetValue( point.x, point.AbsY ) == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
 
                     //check if next point is valid
                     canMoveDown = point.AbsY + 1 < mapData.height &&
                                     !isCurrentBlockDestructibleWall &&
-                                    mapData.data[point.x, point.AbsY + 1] != Constants.INDESTRUCTABLE_WALL_ID;
+                                    mapData.GetValue( point.x, point.AbsY + 1 ) != Constants.INDESTRUCTABLE_WALL_ID;
                 }
                 //right
                 if ( canMoveRight )
                 {
                     var point = new Point( ( int )transform.position.x + i, ( int )transform.position.z );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, point.AbsY] == Constants.DESTRUCTABLE_WALL_ID;
+                    var isCurrentBlockDestructibleWall = mapData.GetValue( point.x, point.AbsY ) == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
                     //check if next point is valid
                     canMoveRight = point.x + 1 < mapData.width &&
                                     !isCurrentBlockDestructibleWall &&
-                                    mapData.data[point.x + 1, point.AbsY] != Constants.INDESTRUCTABLE_WALL_ID;
+                                    mapData.GetValue( point.x + 1, point.AbsY ) != Constants.INDESTRUCTABLE_WALL_ID;
                 }
                 //left
                 if ( canMoveLeft )
                 {
                     var point = new Point( ( int )transform.position.x - i, ( int )transform.position.z );
 
-                    var isCurrentBlockDestructibleWall = mapData.data[point.x, point.AbsY] == Constants.DESTRUCTABLE_WALL_ID;
+                    var isCurrentBlockDestructibleWall = mapData.GetValue( point.x, point.AbsY ) == Constants.DESTRUCTABLE_WALL_ID;
                     DestroyCurrentBlockAndUpdateMapData( isCurrentBlockDestructibleWall, point );
 
                     //check if next point is valid
                     canMoveLeft = point.x - 1 >= 0 &&
                                 !isCurrentBlockDestructibleWall &&
-                                mapData.data[point.x - 1, point.AbsY] != Constants.INDESTRUCTABLE_WALL_ID;
+                                mapData.GetValue( point.x - 1, point.AbsY ) != Constants.INDESTRUCTABLE_WALL_ID;
                 }
 
                 yield return new WaitForSeconds( delay );
@@ -186,7 +193,7 @@ namespace Bomberman
 
             if ( isCurrentBlockDesWall )
             {
-                mapData.data[point.x, point.AbsY] = Constants.GROUND_ID;
+                mapData.SetValue( point.x, point.AbsY, Constants.GROUND_ID );
                 var index = point.x + (point.AbsY * mapData.width);
 
                 var listIndex = wallBlocks.FindIndex( obj => obj.index == index );

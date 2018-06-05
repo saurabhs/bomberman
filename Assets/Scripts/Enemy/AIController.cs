@@ -20,7 +20,6 @@ namespace Bomberman
         #region unity lifecycle
         private void Awake()
         {
-            SetMapData();
         }
 
         private void Update()
