@@ -126,6 +126,7 @@ namespace Bomberman
         public static string GAME_DRAW = "DRAW!!!";
         public static string GAME_YANG = "YANG WINS!!!";
         public static string GAME_YING = "YING WINS!!!";
+        public static string GAME_OVER = "GAME OVER!!!";    //for single player
 
         public static int MAX_DETONATION_DELAY = 10;
 

@@ -127,7 +127,8 @@ namespace Bomberman
         {
             if ( trigger.gameObject.layer == Constants.LAYER_ENEMY )
             {
-                PlayerPrefs.SetString( Constants.GAME_RESULT, (gameObject.name.Split( '_' )[1].ToLower().Equals( "yang" ) ? Constants.GAME_YING : Constants.GAME_YANG) );
+                var isSinglePlayer = PlayerPrefs.GetInt( Constants.GAME_TYPE ) == Constants.SINGLEPLAYER_ID;
+                PlayerPrefs.SetString( Constants.GAME_RESULT, isSinglePlayer ? Constants.GAME_OVER : (gameObject.name.Split( '_' )[1].ToLower().Equals( "yang" ) ? Constants.GAME_YING : Constants.GAME_YANG) );
                 UnityEngine.SceneManagement.SceneManager.LoadScene( "gameover" );
             }
             else if ( trigger.gameObject.layer == Constants.LAYER_POWERUP )
