@@ -117,8 +117,8 @@ namespace Bomberman
         public static int PLAYER2_ID = 4;
         public static int ENEMY_ID = 5;
 
-        public static int SINGLEPLAYER_ID = 100;
-        public static int COOP_ID = 101;
+        public static byte SINGLEPLAYER_ID = 100;
+        public static byte COOP_ID = 101;
 
         public static string GAME_TYPE = "GAME_TYPE";
         public static string GAME_RESULT = "GAME_RESULT";

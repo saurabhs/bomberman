@@ -5,16 +5,18 @@ namespace Bomberman
 {
     public class Menu : MonoBehaviour
     {
-        public Button playButton;
+        public Button playSoloButton;
+        public Button playCoopButton;
 
         private void Start()
         {
-            playButton.onClick.AddListener( () => StartGame() );
+            playSoloButton.onClick.AddListener( () => StartGame( Constants.SINGLEPLAYER_ID ) );
+            playCoopButton.onClick.AddListener( () => StartGame( Constants.COOP_ID ) );
         }
 
-        private void StartGame()
+        private void StartGame( byte playType )
         {
-            PlayerPrefs.SetInt( Constants.GAME_TYPE, Constants.COOP_ID );
+            PlayerPrefs.SetInt( Constants.GAME_TYPE, ( int )playType );
             UnityEngine.SceneManagement.SceneManager.LoadScene( $"map0{Random.Range( 1, 3 )}" );
         }
     }
